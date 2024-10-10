@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "CentralManager.writeDataToPeripheral(data:):CentralManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CentralManager.centralManager(_:didDiscover:advertisementData:rssi:):CentralManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CentralManager.peripheral(_:didDiscoverServices:):CentralManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "service.uuid">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
