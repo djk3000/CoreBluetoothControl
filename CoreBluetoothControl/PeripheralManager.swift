@@ -3,14 +3,17 @@ import CoreBluetooth
 
 class PeripheralManager: NSObject, CBPeripheralDelegate, CBPeripheralManagerDelegate, ObservableObject {
     private var peripheralManager: CBPeripheralManager?
-    let serviceUUID = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba")
+    var serviceUUID = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba")
     let characteristicUUID = CBUUID(string: "87654321-4321-8765-4321-876543218765")
     private var characteristic: CBMutableCharacteristic?
     
+    var canAdvertising: Bool = false
     var services: [CBMutableService]?
     
     @Published var offsetX: CGFloat = 0
     @Published var offsetY: CGFloat = 0
+    
+    @Published var pairCode: String = ""
     
     /**
      初始化
@@ -21,10 +24,24 @@ class PeripheralManager: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         guard peripheral.state == .poweredOn else { return }
-        startAdvertising()
+        canAdvertising = true
+//        startAdvertising()
     }
     
+    func enterPairCode(code: String) {
+        if pairCode.count > 3 { return }
+        pairCode += code
+        if pairCode.count == 4 {
+        }
+    }
+    
+    /**
+     开始广播
+     */
     func startAdvertising() {
+        if peripheralManager?.isAdvertising == true {
+            stopAdvertising()
+        }
         // 创建特性
         characteristic = CBMutableCharacteristic(
             type: characteristicUUID,
@@ -34,6 +51,8 @@ class PeripheralManager: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         )
         
         // 创建服务
+        let uuidString = "9f37e282-60b6-42b1-a02f-7341da5e\(pairCode)"
+        serviceUUID = CBUUID(string: uuidString)
         let service = CBMutableService(type: serviceUUID, primary: true)
         service.characteristics = [characteristic!]
         
@@ -42,6 +61,9 @@ class PeripheralManager: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         peripheralManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey: [services![0].uuid]])
     }
     
+    /**
+     停止广播
+     */
     func stopAdvertising() {
         peripheralManager?.stopAdvertising()
     }

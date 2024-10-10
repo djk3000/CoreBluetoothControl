@@ -11,12 +11,15 @@ import CoreBluetooth
 struct ContentView: View {
     @StateObject var cm: CentralManager = CentralManager()
     @StateObject var pm: PeripheralManager = PeripheralManager()
+    @StateObject var manager: BluetoothManager = BluetoothManager()
+    @StateObject var BleperManager: BLEPeripheralManager = BLEPeripheralManager()
     @State var isCenter: Bool = false
     @State var isPeripheral: Bool = false
+    @State var isManager: Bool = false
     
     var body: some View {
         ZStack {
-            if !isCenter && !isPeripheral {
+            if !isCenter && !isPeripheral && !isManager {
                 main
             }
             
@@ -26,6 +29,10 @@ struct ContentView: View {
             
             if isPeripheral {
                 peripheral
+            }
+            
+            if isManager {
+                managerSearch
             }
         }
     }
@@ -41,13 +48,42 @@ extension ContentView {
             Button("外围设备") {
                 isPeripheral = true
             }
+            
+            Button("扫描设备") {
+                isManager = true
+            }
+            
+            Button("只广播") {
+                BleperManager.startAdvertising()
+            }
+        }
+    }
+    
+    var managerSearch: some View{
+        Text("Discovered Devices")
+            .font(.headline)
+        
+        // 列表显示设备名称
+        return List(manager.discoveredDevices, id: \.identifier) { device in
+            Button(action: {
+                manager.connectToDevice(device)
+            }) {
+                // 如果设备名称为空，则显示 "Unknown Device"
+                Text(device.name ?? "Unknown Device")
+                    .padding()
+            }
         }
     }
     
     var center: some View {
         ZStack {
+            rectangleCentral
+            
             VStack(spacing: 20) {
                 Text("中心设备")
+                    .font(.largeTitle)
+                
+                Text("配对码：\(cm.changeUUID)")
                     .font(.largeTitle)
                 
                 Text("正在扫描，等待连接")
@@ -87,7 +123,7 @@ extension ContentView {
                                     .frame(width: 50, height: 50)
                             }
                             .buttonStyle(.borderedProminent)
-
+                            
                             
                             Button {
                                 cm.writeDataToPeripheral(data: "left".data(using: .utf8)!)
@@ -96,7 +132,7 @@ extension ContentView {
                                     .frame(width: 50, height: 50)
                             }
                             .buttonStyle(.borderedProminent)
-
+                            
                             Button {
                                 cm.writeDataToPeripheral(data: "right".data(using: .utf8)!)
                             } label: {
@@ -113,18 +149,82 @@ extension ContentView {
             .onAppear() {
                 cm.initialize()
             }
-            
-            rectangleCentral
         }
         .padding()
     }
     
     var peripheral: some View {
         ZStack {
+            rectanglePeripheral
+            
             VStack {
                 Text("外围设备")
                     .font(.largeTitle)
                     .padding()
+                
+                VStack {
+                    Text("请输入配对码：\(pm.pairCode)")
+                    
+                    HStack {
+                        ForEach(1..<4){ index in
+                            Button {
+                                pm.enterPairCode(code: index.description)
+                            } label: {
+                                Text("\(index)")
+                                    .frame(width: 30, height: 30)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    HStack {
+                        ForEach(4..<7){ index in
+                            Button {
+                                pm.enterPairCode(code: index.description)
+                            } label: {
+                                Text("\(index)")
+                                    .frame(width: 30, height: 30)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    HStack {
+                        ForEach(7..<10){ index in
+                            Button {
+                                pm.enterPairCode(code: index.description)
+                            } label: {
+                                Text("\(index)")
+                                    .frame(width: 30, height: 30)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    
+                    Button {
+                        pm.enterPairCode(code: "0")
+                    } label: {
+                        Text("0")
+                            .frame(width: 30, height: 30)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    HStack {
+                        Button {
+                            pm.pairCode = ""
+                        } label: {
+                            Text("清空配对码")
+                                .frame(width: 100, height: 40)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        
+                        Button {
+                            pm.startAdvertising()
+                        } label: {
+                            Text("开始配对")
+                                .frame(width: 100, height: 40)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
                 
                 HStack {
                     Button {
@@ -142,7 +242,7 @@ extension ContentView {
                             .frame(width: 50, height: 50)
                     }
                     .buttonStyle(.borderedProminent)
-
+                    
                     
                     Button {
                         pm.sendUpdateToCentral(pos: "left")
@@ -151,7 +251,7 @@ extension ContentView {
                             .frame(width: 50, height: 50)
                     }
                     .buttonStyle(.borderedProminent)
-
+                    
                     Button {
                         pm.sendUpdateToCentral(pos: "right")
                     } label: {
@@ -162,8 +262,6 @@ extension ContentView {
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
-            
-            rectanglePeripheral
         }
         .padding()
         .onAppear() {
@@ -174,7 +272,8 @@ extension ContentView {
     var rectangleCentral: some View {
         Rectangle()
             .frame(width: 100, height: 100)
-            .foregroundColor(.blue)
+            .foregroundColor(.red)
+            .opacity(0.5)
             .padding(.top, cm.offsetY)
             .padding(.bottom, -cm.offsetY)
             .padding(.leading, cm.offsetX)
@@ -195,7 +294,8 @@ extension ContentView {
     var rectanglePeripheral: some View {
         Rectangle()
             .frame(width: 100, height: 100)
-            .foregroundColor(.blue)
+            .foregroundColor(.red)
+            .opacity(0.5)
             .padding(.top, pm.offsetY)
             .padding(.bottom, -pm.offsetY)
             .padding(.leading, pm.offsetX)

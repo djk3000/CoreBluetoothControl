@@ -13,6 +13,8 @@
 		FB52ADF52AD9122800DE7FDA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB52ADF42AD9122800DE7FDA /* Assets.xcassets */; };
 		FB52AE1D2AD946AB00DE7FDA /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = FB52AE1C2AD946AB00DE7FDA /* Preview Content */; };
 		FB52AE1F2AD946D100DE7FDA /* CentralManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB52AE1E2AD946D100DE7FDA /* CentralManager.swift */; };
+		FBC762CD2CB7B2B40096FD55 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC762CC2CB7B2B40096FD55 /* BluetoothManager.swift */; };
+		FBC762CF2CB7C24B0096FD55 /* BlePeripheralManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC762CE2CB7C24B0096FD55 /* BlePeripheralManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +44,8 @@
 		FB52AE072AD9122800DE7FDA /* CoreBluetoothControlUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoreBluetoothControlUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB52AE1C2AD946AB00DE7FDA /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Preview Content"; sourceTree = "<group>"; };
 		FB52AE1E2AD946D100DE7FDA /* CentralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManager.swift; sourceTree = "<group>"; };
+		FBC762CC2CB7B2B40096FD55 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
+		FBC762CE2CB7C24B0096FD55 /* BlePeripheralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlePeripheralManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,10 +96,12 @@
 			children = (
 				FB52ADF02AD9122600DE7FDA /* CoreBluetoothControlApp.swift */,
 				FB52ADF22AD9122600DE7FDA /* ContentView.swift */,
+				FBC762CC2CB7B2B40096FD55 /* BluetoothManager.swift */,
 				FB52AE1E2AD946D100DE7FDA /* CentralManager.swift */,
 				FB329E2F2ADA7063003F2B21 /* PeripheralManager.swift */,
 				FB52ADF42AD9122800DE7FDA /* Assets.xcassets */,
 				FB52AE1C2AD946AB00DE7FDA /* Preview Content */,
+				FBC762CE2CB7C24B0096FD55 /* BlePeripheralManager.swift */,
 			);
 			path = CoreBluetoothControl;
 			sourceTree = "<group>";
@@ -234,6 +240,8 @@
 				FB329E302ADA7063003F2B21 /* PeripheralManager.swift in Sources */,
 				FB52ADF12AD9122600DE7FDA /* CoreBluetoothControlApp.swift in Sources */,
 				FB52AE1F2AD946D100DE7FDA /* CentralManager.swift in Sources */,
+				FBC762CD2CB7B2B40096FD55 /* BluetoothManager.swift in Sources */,
+				FBC762CF2CB7C24B0096FD55 /* BlePeripheralManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,7 +397,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CoreBluetoothControl/Preview Content\"";
-				DEVELOPMENT_TEAM = 9MZ6AGR4FJ;
+				DEVELOPMENT_TEAM = GN278HWQNW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "蓝牙设备互联";
@@ -422,7 +430,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CoreBluetoothControl/Preview Content\"";
-				DEVELOPMENT_TEAM = 9MZ6AGR4FJ;
+				DEVELOPMENT_TEAM = GN278HWQNW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "蓝牙设备互联";

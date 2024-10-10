@@ -5,20 +5,26 @@ class CentralManager :  NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var centralManager: CBCentralManager?
     private var peripheral: CBPeripheral?
     private var peripheralName: String = ""
-    let serviceUUID = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba")
+    var serviceUUID = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba")
     let characteristicUUID = CBUUID(string: "87654321-4321-8765-4321-876543218765")
+    
+    private var rssiThreshold: Int = -60
     
     var characteristic: CBCharacteristic?
     
     @Published var name: String = ""
     @Published var offsetX: CGFloat = 0
     @Published var offsetY: CGFloat = 0
+    @Published var changeUUID: String = ""
     
     func initialize() {
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
     func startScanning() {
+        changeUUID = Int(arc4random_uniform(8999)+1000).description
+        let uuidString = "9f37e282-60b6-42b1-a02f-7341da5e\(changeUUID)"
+        serviceUUID = CBUUID(string: uuidString)
         centralManager?.scanForPeripherals(withServices: [serviceUUID], options: nil)
     }
     
@@ -48,23 +54,41 @@ class CentralManager :  NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
      */
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
-        if peripheral.name == nil { return }
-        //        print(peripheral.name ?? 0)
-        //        print(RSSI.intValue)
-        name = peripheral.name!
+        guard let advertismentServiceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] else {
+            return
+        }
+        
+        if RSSI.intValue < rssiThreshold {
+            // RSSI 低于阈值，断开连接
+            disconnectFromPeripheral()
+            return
+        }
+        
+        let uuid = advertismentServiceUUIDs.first!
+        name = peripheral.name ?? uuid.uuidString
         self.peripheral = peripheral
         connectToPeripheral()
         
-        /*
-         根据蓝牙名称判断
-         */
-        if peripheral.name == "蓝牙名称" {
-            if peripheral.name == nil { return }
-            print(peripheral.name ?? 0)
-            print(RSSI.intValue)
-            
-            self.peripheral = peripheral
-            connectToPeripheral()
+        //        /*
+        //         根据蓝牙名称判断
+        //         */
+        //        if peripheral.name == "蓝牙名称" {
+        //            if peripheral.name == nil { return }
+        //            print(peripheral.name ?? 0)
+        //            print(RSSI.intValue)
+        //
+        //            self.peripheral = peripheral
+        //            connectToPeripheral()
+        //        }
+    }
+    
+    /**
+     断开连接
+     */
+    func disconnectFromPeripheral() {
+        if let peripheral = peripheral {
+            centralManager?.cancelPeripheralConnection(peripheral)
+            self.peripheral = nil
         }
     }
     
@@ -72,7 +96,7 @@ class CentralManager :  NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
      是否外围设备连接成功
      */
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        stopScanning()
+        //        stopScanning()
         peripheral.delegate = self
         
         peripheral.discoverServices(nil)
@@ -89,11 +113,8 @@ class CentralManager :  NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
         if let services = peripheral.services {
             for service in services {
-                print(service.uuid.uuidString)
-                //9f37e282-60b6-42b1-a02f-7341da5e2eba
+                //                print(service.uuid.uuidString)
                 if service.uuid == serviceUUID {
-                    // You have found the desired service
-                    // Now you can discover characteristics or perform other actions
                     peripheral.services?.forEach { service in
                         peripheral.discoverCharacteristics([characteristicUUID], for: service)
                     }
@@ -156,21 +177,20 @@ class CentralManager :  NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
-    /**
-     断开连接
-     */
-    func disconnectFromPeripheral() {
-        if let peripheral = peripheral {
-            centralManager?.cancelPeripheralConnection(peripheral)
-        }
-    }
-    
     // 外围设备断开连接时调用
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if peripheral == self.peripheral {
-            // 外围设备与中央设备的连接已断开
-            self.peripheral = nil
-            self.name = ""
-        }
+        // 外围设备与中央设备的连接已断开
+        self.peripheral = nil
+        self.name = ""
+        print("断开连接")
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        // 外围设备关闭程序
+//        for service in invalidatedServices {
+//            // 处理被修改或删除的服务
+//            disconnectFromPeripheral()
+//        }
+        disconnectFromPeripheral()
     }
 }
